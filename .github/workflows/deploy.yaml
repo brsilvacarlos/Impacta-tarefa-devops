@@ -7,7 +7,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: actions/setup-node@v1
         with:
           node-version: '20'
@@ -20,12 +20,15 @@ jobs:
           echo "https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
           git config --global user.email $email
           git config --global user.name $username
-      - name: deploy to gh-pages
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+      - name: build
         run: |
           npm i
           NODE_ENV=production npm run build
+      - name: deploy to gh-pages
+        run: |
           cd dist
           git init
           git add -A
           git commit -m "🚀 Deploy id ${GITHUB_RUN_ID}"
-          git push -f "https://github.com/${GITHUB_REPOSITORY}.git" main:gh-pages
+          git push
