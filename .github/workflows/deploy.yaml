@@ -13,13 +13,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '20'
-      - name: setup git auth
+      - name: setup git config
         env:
           email: 'brsilvacarlos@gmail.com'
           username: 'brsilvacarlos'
         run: |
-          git config --global credential.helper store
-          echo "https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
           git config --global user.email $email
           git config --global user.name $username
           git config --global init.defaultBranch master
@@ -30,6 +28,7 @@ jobs:
       - name: deploy to gh-pages
         run:  |
           cd dist
+          git init
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git add -A
           git commit -m "🚀 Deploy id ${GITHUB_RUN_ID}"
