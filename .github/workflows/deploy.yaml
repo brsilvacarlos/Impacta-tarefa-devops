@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+permissions:
+  contents: write
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -20,15 +22,15 @@ jobs:
           echo "https://${{ secrets.GITHUB_TOKEN }}:x-oauth-basic@github.com" > ~/.git-credentials
           git config --global user.email $email
           git config --global user.name $username
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git config --global init.defaultBranch master
       - name: build
         run: |
           npm i
           NODE_ENV=production npm run build
       - name: deploy to gh-pages
-        run: |
+        run:  |
           cd dist
-          git init
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
           git add -A
           git commit -m "🚀 Deploy id ${GITHUB_RUN_ID}"
           git push -f origin gh-pages
